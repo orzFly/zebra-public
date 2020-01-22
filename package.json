@@ -19,7 +19,7 @@
     "constraints": "yarn berry constraints",
     "fix": "run-s -n fix-*",
     "fix-constraints": "yarn constraints --fix",
-    "fix-package.json": "sort-package-json package.json packages/*/package.json",
+    "fix-package.json": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json .local/*/package.json",
     "fix-yarn.lock": "yarn-deduplicate yarn.lock",
     "lint": "run-s -n lint-*",
     "lint-constraints": "yarn constraints",

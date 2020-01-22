@@ -1,8 +1,8 @@
 {
   "name": "@local-workspace/tsconfig",
   "version": "1.0.0",
-  "license": "UNLICENSED",
   "private": true,
+  "license": "UNLICENSED",
   "orz": {
     "builder": false
   }
