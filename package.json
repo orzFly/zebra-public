@@ -30,6 +30,7 @@
     "@orz/tslint-rules": "^1.0.0",
     "@orz/typescript": "^1.0.0",
     "@types/bluebird": "^3.5.27",
+    "@types/emscripten": "^1.39.0",
     "@types/rimraf": "2.0.3",
     "lerna": "^3.5.0",
     "rimraf": "^3.0.0",
