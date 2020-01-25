@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "license": "UNLICENSED",
+  "devDependencies": {
+    "@orz/tslint-rules": "^1.0.0"
+  },
   "orz": {
     "builder": false
   }

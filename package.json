@@ -15,7 +15,7 @@
     "all:cleanwatch": "run-s \"all:clean {@}\" \"all:build {@}\" \"all:watch {@}\" --",
     "all:lint": "lerna run lint --include-dependencies --stream --concurrency 4",
     "all:watch": "lerna run watch --include-dependencies --stream --parallel",
-    "berry": "env --unset=YARN_WRAP_OUTPUT YARN_IGNORE_PATH=1 node .yarn/releases/yarn-sources.js",
+    "berry": "env --unset=YARN_WRAP_OUTPUT YARN_IGNORE_PATH=1 node .yarn/releases/berry.js",
     "constraints": "yarn berry constraints",
     "fix": "run-s -n fix-*",
     "fix-constraints": "yarn constraints --fix",
@@ -27,11 +27,8 @@
     "lint-yarn.lock": "yarn-deduplicate --list yarn.lock"
   },
   "devDependencies": {
-    "@orz/tslint-rules": "^1.0.0",
     "@orz/typescript": "^1.0.0",
-    "@types/bluebird": "^3.5.27",
     "@types/emscripten": "^1.39.0",
-    "@types/rimraf": "2.0.3",
     "lerna": "^3.5.0",
     "rimraf": "^3.0.0",
     "sort-package-json": "^1.31.0",
