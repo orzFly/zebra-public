@@ -9,22 +9,16 @@
     ".local/*"
   ],
   "scripts": {
-    "all:build": "lerna run build --include-dependencies --stream --concurrency 4",
-    "all:clean": "lerna run clean --include-dependencies --stream --concurrency 4 --no-sort",
-    "all:cleanbuild": "run-s \"all:clean {@}\" \"all:build {@}\" --",
-    "all:cleanwatch": "run-s \"all:clean {@}\" \"all:build {@}\" \"all:watch {@}\" --",
     "all:lint": "lerna run lint --include-dependencies --stream --concurrency 4",
-    "all:watch": "lerna run watch --include-dependencies --stream --parallel",
     "berry": "env --unset=YARN_WRAP_OUTPUT YARN_IGNORE_PATH=1 node .yarn/releases/berry.js",
+    "build": "invoke pipeline build",
+    "clean": "invoke pipeline clean",
+    "cleanbuild": "invoke pipeline cleanbuild",
+    "cleanwatch": "invoke pipeline cleanwatch",
     "constraints": "yarn berry constraints",
-    "fix": "run-s -n fix-*",
-    "fix-constraints": "yarn constraints --fix",
-    "fix-package.json": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json .local/*/package.json",
-    "fix-yarn.lock": "yarn-deduplicate yarn.lock",
-    "lint": "run-s -n lint-*",
-    "lint-constraints": "yarn constraints",
-    "lint-package.json": "yarn fix-package.json --check",
-    "lint-yarn.lock": "yarn-deduplicate --list yarn.lock"
+    "fix": "invoke pipeline fix",
+    "lint": "invoke pipeline lint",
+    "watch": "invoke pipeline watch"
   },
   "devDependencies": {
     "@orz/typescript": "^1.0.0",
@@ -33,6 +27,26 @@
     "rimraf": "^3.0.0",
     "sort-package-json": "^1.31.0",
     "yarn-deduplicate": "^1.1.1"
+  },
+  "invoke/pipeline": {
+    "constraints": {
+      "lint": "yarn berry constraints",
+      "fix": "yarn constraints --fix"
+    },
+    "package.json": {
+      "$requires": [
+        "constraints"
+      ],
+      "lint": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json .local/*/package.json --check",
+      "fix": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json .local/*/package.json"
+    },
+    "yarn.lock": {
+      "$requires": [
+        "package.json"
+      ],
+      "lint": "yarn-deduplicate --list yarn.lock",
+      "fix": "yarn-deduplicate yarn.lock && yarn"
+    }
   },
   "orz": {
     "builder": false

@@ -10,22 +10,46 @@ gen_enforced_field(WorkspaceCwd, license, 'UNLICENSED') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, license, _).
 
-gen_enforced_field(WorkspaceCwd, 'scripts.clean', 'rimraf dist') :-
+gen_enforced_field(WorkspaceCwd, 'scripts.clean', 'invoke pipeline clean') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
 
-gen_enforced_field(WorkspaceCwd, 'scripts.build', 'tsc') :-
+gen_enforced_field(WorkspaceCwd, 'scripts.build', 'invoke pipeline build') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
 
-gen_enforced_field(WorkspaceCwd, 'scripts.watch', 'tsc --watch --preserveWatchOutput') :-
+gen_enforced_field(WorkspaceCwd, 'scripts.watch', 'invoke pipeline watch') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
 
-gen_enforced_field(WorkspaceCwd, 'scripts.cleanbuild', 'run-s clean build') :-
+gen_enforced_field(WorkspaceCwd, 'scripts.cleanbuild', 'invoke pipeline cleanbuild') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
 
-gen_enforced_field(WorkspaceCwd, 'scripts.cleanwatch', 'run-s clean watch') :-
+gen_enforced_field(WorkspaceCwd, 'scripts.cleanwatch', 'invoke pipeline cleanwatch') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
+
+gen_enforced_field(WorkspaceCwd, 'scripts.lint', 'invoke pipeline lint') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
+
+gen_enforced_field(WorkspaceCwd, 'scripts.fix', 'invoke pipeline fix') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
+
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.build', 'tsc') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
+
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.watch', 'tsc --watch --preserveWatchOutput') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
+
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.clean', 'rimraf dist') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
+
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.lint', 'tslint --project tsconfig.json --config tslint.json') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
