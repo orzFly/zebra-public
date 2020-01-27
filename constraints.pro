@@ -46,7 +46,7 @@ gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.watch', 'tsc --watc
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
 
-gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.clean', 'rimraf dist') :-
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.clean', 'rimraf lib') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'orz.builder', false).
 
