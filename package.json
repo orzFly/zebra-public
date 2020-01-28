@@ -14,6 +14,8 @@
     "clean": "invoke pipeline clean",
     "cleanbuild": "invoke pipeline cleanbuild",
     "cleanwatch": "invoke pipeline cleanwatch",
+    "dev": "invoke pipeline dev",
+    "dist": "invoke pipeline dist",
     "fix": "invoke pipeline fix",
     "lint": "invoke pipeline lint",
     "watch": "invoke pipeline watch"

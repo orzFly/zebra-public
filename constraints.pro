@@ -38,6 +38,14 @@ gen_enforced_field(WorkspaceCwd, 'scripts.fix', 'invoke pipeline fix') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false).
 
+gen_enforced_field(WorkspaceCwd, 'scripts.dev', 'invoke pipeline dev') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false).
+
+gen_enforced_field(WorkspaceCwd, 'scripts.dist', 'invoke pipeline dist') :-
+    workspace(WorkspaceCwd),
+    \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false).
+
 gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.build', 'tsc') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false),
