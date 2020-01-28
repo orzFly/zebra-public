@@ -9,13 +9,11 @@
     ".local/*"
   ],
   "scripts": {
-    "all:lint": "lerna run lint --include-dependencies --stream --concurrency 4",
     "berry": "env --unset=YARN_WRAP_OUTPUT YARN_IGNORE_PATH=1 node .yarn/releases/berry.js",
     "build": "invoke pipeline build",
     "clean": "invoke pipeline clean",
     "cleanbuild": "invoke pipeline cleanbuild",
     "cleanwatch": "invoke pipeline cleanwatch",
-    "constraints": "yarn berry constraints",
     "fix": "invoke pipeline fix",
     "lint": "invoke pipeline lint",
     "watch": "invoke pipeline watch"
@@ -31,7 +29,7 @@
   "invoke/pipeline": {
     "constraints": {
       "lint": "yarn berry constraints",
-      "fix": "yarn constraints --fix"
+      "fix": "yarn berry constraints --fix"
     },
     "package.json": {
       "$requires": [
@@ -46,9 +44,7 @@
       ],
       "lint": "yarn-deduplicate --list yarn.lock",
       "fix": "yarn-deduplicate yarn.lock && yarn"
-    }
-  },
-  "orz": {
-    "builder": false
+    },
+    "$auto": false
   }
 }
