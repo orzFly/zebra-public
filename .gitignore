@@ -5,8 +5,9 @@
 /.yarn/build-state.yml
 
 # dist
-dist
-lib
+dist/
+dist-dev/
+lib/
 
 # Logs
 logs
