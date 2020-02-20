@@ -49,6 +49,12 @@
       "lint": "yarn-deduplicate --list yarn.lock",
       "fix": "yarn-deduplicate yarn.lock && yarn"
     },
+    "yarn-public.lock": {
+      "$requires": [
+        "yarn.lock"
+      ],
+      "fix": "yarn invoke @extractLockFile"
+    },
     "$auto": false
   }
 }

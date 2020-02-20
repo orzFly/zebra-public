@@ -1,5 +1,6 @@
 import { ArchiveCommand } from "./ArchiveCommand";
 import { CollectDistCommand } from "./CollectDistCommand";
+import { ExtractLockFileCommand } from "./ExtractLockFileCommand";
 import { FactInvokePathCommand } from "./FactInvokePathCommand";
 import { FactProjectNameCommand } from "./FactProjectNameCommand";
 import { FactProjectRootCommand } from "./FactProjectRootCommand";
@@ -15,6 +16,7 @@ export function getCommands() {
     ArchiveCommand,
     PipelineCommand,
     CollectDistCommand,
+    ExtractLockFileCommand,
 
     SymbolShellCommand,
     SymbolHelpCommand,
