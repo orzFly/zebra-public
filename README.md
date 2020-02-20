@@ -3,7 +3,7 @@ Zebra
 
 ## License
 
-Different packages or projects may have diffenent licenses.
+Different packages or projects may have different licenses.
 This repo is open-source but we haven't decide a suitable license yet.
 The plan is to eventually open the license up to something permissive.
 
