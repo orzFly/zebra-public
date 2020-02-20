@@ -1,0 +1,10 @@
+{
+  "extends": "@local-workspace/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "lib",
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "extends": "@local-workspace/tsconfig/tslint.json"
+}

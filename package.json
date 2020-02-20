@@ -4,6 +4,8 @@
   "private": true,
   "license": "UNLICENSED",
   "workspaces": [
+    "public-packages/@*/*",
+    "public-packages/*",
     "packages/@*/*",
     "packages/*",
     ".local/*"

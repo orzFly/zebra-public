@@ -1,0 +1,32 @@
+{
+  "name": "@orz/override-require",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "files": [
+    "lib"
+  ],
+  "main": "lib",
+  "types": "lib",
+  "scripts": {
+    "build": "invoke pipeline build",
+    "clean": "invoke pipeline clean",
+    "cleanbuild": "invoke pipeline cleanbuild",
+    "cleanwatch": "invoke pipeline cleanwatch",
+    "dev": "invoke pipeline dev",
+    "dist": "invoke pipeline dist",
+    "fix": "invoke pipeline fix",
+    "lint": "invoke pipeline lint",
+    "watch": "invoke pipeline watch"
+  },
+  "devDependencies": {
+    "@types/node": "13.7.1"
+  },
+  "invoke/pipeline": {
+    "typescript": {
+      "build": "tsc",
+      "clean": "rimraf lib",
+      "lint": "tslint --project tsconfig.json --config tslint.json",
+      "watch": "tsc --watch --preserveWatchOutput"
+    }
+  }
+}

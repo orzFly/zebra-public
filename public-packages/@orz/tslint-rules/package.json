@@ -1,0 +1,17 @@
+{
+  "name": "@orz/tslint-rules",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "files": [
+    "tslint.json"
+  ],
+  "main": "tslint.json",
+  "dependencies": {
+    "tslint-no-unused-expression-chai": "^0.1.4"
+  },
+  "peerDependencies": {
+    "tslint": "*",
+    "typescript": "*"
+  },
+  "invoke/pipeline": false
+}
