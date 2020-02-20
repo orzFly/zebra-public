@@ -1,0 +1,53 @@
+name: General Build and Test (Linux / Node.js)
+
+on:
+  push:
+    branches:
+    - master
+    - 'public/**'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x, 13.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: yarn install
+      run: yarn install --frozen-lockfile
+      env:
+        CI: true
+
+    - name: yarn build
+      run: yarn build
+      env:
+        CI: true
+
+    - name: yarn dist
+      run: yarn dist
+      env:
+        CI: true
+
+    - name: Collect dist
+      run: yarn invoke @collectDist
+      env:
+        CI: true
+
+    - name: List dist file
+      run: |
+        ls -al dist
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: dist
+        path: dist
