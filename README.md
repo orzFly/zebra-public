@@ -39,7 +39,7 @@ Of course, and you will find octocats or dragons [there](https://github.com/orzF
 
 #### What is a *Metarepo*?
 
-We learnt this concept from [Bubble Dev Metarepo](https://github.com/bubble-dev/_).
+We learnt this concept from [Bubble Dev Metarepo](https://github.com/bubble-dev/_/blob/aae48cab9d61ef401c04f764a1c9e0b5d2174ad9/readme.md).
 
 > The *Metarepo* is a new concept that we are trying out to simplify the development process.
 > Many of the projects are dependencies of each other, so we can iterate in all at the same time. ...
