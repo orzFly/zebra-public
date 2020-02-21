@@ -4,7 +4,11 @@
   "private": true,
   "license": "MIT",
   "author": "Yeechan Lu",
-  "main": "index.js",
+  "files": [
+    "lib"
+  ],
+  "main": "lib",
+  "types": "lib",
   "scripts": {
     "build": "invoke pipeline build",
     "clean": "invoke pipeline clean",
