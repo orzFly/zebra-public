@@ -5,6 +5,7 @@ export function immediate<R>(value: Resolvable<R>): GenericPromise<R>;
 export function immediate(): GenericPromise<void>;
 
 export function immediate(
+  this: any,
   value?: any
 ): GenericPromise<any> {
   const Promise = getPromiseConstructor(this);

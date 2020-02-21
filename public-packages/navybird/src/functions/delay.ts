@@ -10,6 +10,7 @@ export function delay<R>(ms: number, value: Resolvable<R>): GenericPromise<R>;
 export function delay(ms: number): GenericPromise<void>;
 
 export function delay(
+  this: any,
   ms: number,
   value?: any
 ): GenericPromise<any> {

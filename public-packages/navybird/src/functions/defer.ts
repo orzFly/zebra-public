@@ -25,7 +25,7 @@ export class Defer<T> {
   }
 }
 
-export function defer<T = any>(): Defer<T> {
+export function defer<T = any>(this: any): Defer<T> {
   const Promise = getPromiseConstructor(this);
   return new Defer<T>(Promise);
 };

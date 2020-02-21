@@ -11,6 +11,7 @@ export function schedulePromise<R>(value: Resolvable<R>): GenericPromise<R>;
 export function schedulePromise(): GenericPromise<void>;
 
 export function schedulePromise(
+  this: any,
   value?: any
 ): GenericPromise<any> {
   const Promise = getPromiseConstructor(this);

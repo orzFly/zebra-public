@@ -1,7 +1,7 @@
 import { TypeError } from '../errors/TypeError';
 import { GenericPromise } from '../helpers/getPromiseConstructor';
-import { PromiseLikeValueType } from '../helpers/types';
 import { notEnumerableProp } from '../helpers/notEnumerableProp';
+import { PromiseLikeValueType } from '../helpers/types';
 
 export class Inspection<P extends PromiseLike<any>> {
   private _isPending: boolean

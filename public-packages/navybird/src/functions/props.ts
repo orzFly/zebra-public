@@ -1,5 +1,5 @@
-import { Resolvable } from "../helpers/types";
 import { GenericPromise, getPromiseConstructor } from "../helpers/getPromiseConstructor";
+import { Resolvable } from "../helpers/types";
 
 export type ResolvableProps<T> = object & { [K in keyof T]: Resolvable<T[K]> };
 
@@ -17,7 +17,7 @@ export type ResolvableProps<T> = object & { [K in keyof T]: Resolvable<T[K]> };
 export function props<K, V>(promise: Resolvable<Map<K, Resolvable<V>>>): GenericPromise<Map<K, V>>;
 export function props<T>(promise: Resolvable<ResolvableProps<T>>): GenericPromise<T>;
 
-export function props(p: any) {
+export function props(this: any, p: any) {
   const Promise = getPromiseConstructor(this);
   return Promise.resolve((async () => {
     const input = await p;

@@ -24,6 +24,7 @@ export function reduce<R>(
 ): GenericPromise<R>
 
 export function reduce<R, U>(
+  this: any,
   iterable: Resolvable<Iterable<Resolvable<R>>>,
   reducer: (memo: U, current: R, index: number, arrayLength: number) => Resolvable<U>,
   initialValue?: U

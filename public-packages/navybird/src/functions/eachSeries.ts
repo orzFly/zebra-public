@@ -11,6 +11,7 @@ import { tapSchedule } from './schedule';
  * If the iterator function returns a promise or a thenable, the result for the promise is awaited for before continuing with next iteration.
  */
 export function eachSeries<R, U>(
+  this: any,
   iterable: Resolvable<Iterable<Resolvable<R>>>,
   iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>
 ): GenericPromise<R[]> {

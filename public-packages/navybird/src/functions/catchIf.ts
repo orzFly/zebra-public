@@ -4,9 +4,7 @@ import { CatchFilter } from "./caught";
 // https://github.com/sindresorhus/p-catch-if
 // MIT © Sindre Sorhus
 
-interface ErrorConstructor {
-  new(message?: string): Error;
-}
+type ErrorConstructor = new(message?: string) => Error;
 
 function isErrorConstructor(constructor: unknown): constructor is ErrorConstructor {
   return constructor === Error || (constructor && (<any>constructor).prototype instanceof Error);
@@ -15,7 +13,7 @@ function isErrorConstructor(constructor: unknown): constructor is ErrorConstruct
 export function catchIf<T>(predicates: ReadonlyArray<CatchFilter<any>>, catchHandler: (error: Error) => T | PromiseLike<T>): (
   error: Error
 ) => T | PromiseLike<T> {
-  return async function catchIfHandler(error) {
+  return async function catchIfHandler(this: any, error) {
     const THIS = this;
     if (typeof catchHandler !== 'function') {
       throw new TypeError('Expected a catch handler');

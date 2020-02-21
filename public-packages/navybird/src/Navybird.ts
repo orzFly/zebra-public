@@ -28,6 +28,8 @@ import { notEnumerableProp } from './helpers/notEnumerableProp';
 import { PromiseLikeValueType, Resolvable } from './helpers/types';
 import { warning } from './helpers/warning';
 
+// tslint:disable: callable-types
+
 const nativePromiseMethods = (
   <K extends Array<keyof PromiseConstructor>>(...keys: K):
     Pick<PromiseConstructor, Extract<K[keyof K], keyof PromiseConstructor>> => {
@@ -49,16 +51,16 @@ function createBoundInstance(thisArg?: any) {
   const then = Boundbird.prototype.then
   const ref = { thisArg };
   (Boundbird.prototype as any)[ThisBoundedSymbol] = ref;
-  Boundbird.prototype.then = function boundThen(onfulfilled?, onrejected?) {
+  Boundbird.prototype.then = function boundThen(this: Navybird<any>, onfulfilled?, onrejected?) {
     return then.call(this,
       onfulfilled && function boundOnFulfilled() {
-        return onfulfilled.apply(ref.thisArg, arguments)
+        return (onfulfilled.apply as Function)(ref.thisArg, arguments)
       },
       onrejected && function boundOnRejected() {
-        return onrejected.apply(ref.thisArg, arguments)
+        return (onrejected.apply as Function)(ref.thisArg, arguments)
       }
     )
-  }
+  } as Navybird<any>['then']
   return { Boundbird, ref };
 }
 
@@ -75,7 +77,7 @@ export class Navybird<T> extends Promise<T> {
   /** @deprecated */
   bind(thisArg: any): Navybird<T> {
     const { Boundbird, ref } = createBoundInstance()
-    let throwed = false, error: any = undefined;
+    let throwed = false, error: any;
     const valuePromise = Boundbird.resolve(thisArg)
       .tap((r) => ref.thisArg = r)
       .tapCatch((err) => { throwed = true; error = err; })
@@ -94,7 +96,7 @@ export class Navybird<T> extends Promise<T> {
    * @$TypeExpand typeof defer
    * @$$Eval (str) => str.replace(/Defer</g, "NavybirdDefer<")
    */
-  static defer: <T = any>() => NavybirdDefer<T> = null as any
+  static defer: <T = any>(this: any) => NavybirdDefer<T> = null as any
 
   /**
    * @$TypeExpand typeof delay
@@ -106,13 +108,13 @@ export class Navybird<T> extends Promise<T> {
    * @$TypeExpand typeof eachSeries
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
    */
-  static each: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]> = null as any
+  static each: <R, U>(this: any, iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]> = null as any
 
   /**
    * @$TypeExpand typeof eachSeries
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
    */
-  static eachSeries: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]> = null as any
+  static eachSeries: <R, U>(this: any, iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]> = null as any
 
   /**
    * @$TypeExpand typeof immediate
@@ -142,13 +144,13 @@ export class Navybird<T> extends Promise<T> {
    * @$TypeExpand typeof map
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
    */
-  static map: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, mapper: (item: R, index: number, arrayLength: number) => Resolvable<U>, opts?: ConcurrencyOption) => Navybird<U[]> = null as any
+  static map: <R, U>(this: any, iterable: Resolvable<Iterable<Resolvable<R>>>, mapper: (item: R, index: number, arrayLength: number) => Resolvable<U>, opts?: ConcurrencyOption) => Navybird<U[]> = null as any
 
   /**
    * @$TypeExpand typeof mapSeries
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
    */
-  static mapSeries: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<U[]> = null as any
+  static mapSeries: <R, U>(this: any, iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<U[]> = null as any
 
   /**
    * @$TypeExpand typeof reduce
@@ -166,7 +168,7 @@ export class Navybird<T> extends Promise<T> {
    * @$TypeExpand typeof attempt
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
    */
-  static attempt: <T>(fn: () => T | PromiseLike<T>) => Navybird<T> = null as any
+  static attempt: <T>(this: any, fn: () => T | PromiseLike<T>) => Navybird<T> = null as any
 
   static try = Navybird.attempt
 
@@ -174,7 +176,7 @@ export class Navybird<T> extends Promise<T> {
    * @$TypeExpand typeof method
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
    */
-  static method: <T, Args extends any[]>(fn: (...args: Args) => T | PromiseLike<T>) => (...args: Args) => Navybird<T> = null as any
+  static method: <T, Args extends any[]>(this: any, fn: (...args: Args) => T | PromiseLike<T>) => (...args: Args) => Navybird<T> = null as any
 
   /**
    * @$TypeExpand typeof props
@@ -311,7 +313,7 @@ export class Navybird<T> extends Promise<T> {
    */
   spread<U, Q>(this: Navybird<T & Iterable<Q>>, fulfilledHandler: (...values: Q[]) => Resolvable<U>): Navybird<U> {
     const promiseConstructor = this.constructor as typeof Navybird;
-    return this.then(function spreadOnFulfilled(val) {
+    return this.then(function spreadOnFulfilled(this: any, val) {
       if (typeof fulfilledHandler !== "function") {
         throw new errors.TypeError(`fulfilledHandler is not function`);
         // TODO: return utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
@@ -338,7 +340,7 @@ export class Navybird<T> extends Promise<T> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function allOnFulfilled(val: any) {
-      return promiseConstructor.all.call(promiseConstructor, val, ...args);
+      return (promiseConstructor.all as Function).call(promiseConstructor, val, ...args);
     });
   }
 
@@ -374,9 +376,9 @@ export class Navybird<T> extends Promise<T> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     const promise = this as this & { [ThisBoundedSymbol]?: any };
-    return promise.then(function mapOnFulfilled(val: any) {
+    return promise.then(function mapOnFulfilled(this: any, val: any) {
       if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
-      return promiseConstructor.map.call(promiseConstructor, val, ...args);
+      return (promiseConstructor.map as Function).call(promiseConstructor, val, ...args);
     });
   }
 
@@ -389,9 +391,9 @@ export class Navybird<T> extends Promise<T> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     const promise = this as this & { [ThisBoundedSymbol]?: any };
-    return promise.then(function mapSeriesOnFulfilled(val: any) {
+    return promise.then(function mapSeriesOnFulfilled(this: any, val: any) {
       if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
-      return promiseConstructor.mapSeries.call(promiseConstructor, val, ...args);
+      return (promiseConstructor.mapSeries as Function).call(promiseConstructor, val, ...args);
     });
   }
 
@@ -404,9 +406,9 @@ export class Navybird<T> extends Promise<T> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     const promise = this as this & { [ThisBoundedSymbol]?: any };
-    return promise.then(function reduceOnFulfilled(val: any) {
+    return promise.then(function reduceOnFulfilled(this: any, val: any) {
       if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
-      return promiseConstructor.reduce.call(promiseConstructor, val, ...args);
+      return (promiseConstructor.reduce as Function).call(promiseConstructor, val, ...args);
     });
   }
 
@@ -419,9 +421,9 @@ export class Navybird<T> extends Promise<T> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     const promise = this as this & { [ThisBoundedSymbol]?: any };
-    return promise.then(function eachOnFulfilled(val: any) {
+    return promise.then(function eachOnFulfilled(this: any, val: any) {
       if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
-      return promiseConstructor.each.call(promiseConstructor, val, ...args);
+      return (promiseConstructor.each as Function).call(promiseConstructor, val, ...args);
     });
   }
 
@@ -434,9 +436,9 @@ export class Navybird<T> extends Promise<T> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     const promise = this as this & { [ThisBoundedSymbol]?: any };
-    return promise.then(function eachSeriesOnFulfilled(val: any) {
+    return promise.then(function eachSeriesOnFulfilled(this: any, val: any) {
       if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
-      return promiseConstructor.eachSeries.call(promiseConstructor, val, ...args);
+      return (promiseConstructor.eachSeries as Function).call(promiseConstructor, val, ...args);
     });
   }
 
@@ -462,7 +464,7 @@ export class Navybird<T> extends Promise<T> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function propsOnFulfilled(val: any) {
-      return promiseConstructor.props.call(promiseConstructor, val, ...args);
+      return (promiseConstructor.props as Function).call(promiseConstructor, val, ...args);
     });
   }
 
@@ -475,11 +477,11 @@ export class Navybird<T> extends Promise<T> {
    * resolve, or rejected when any Promise is rejected.
    * @param values An array of Promises.
    * @returns A new Promise.
-   * 
+   *
    * @$TypeExpand PromiseConstructor['all']
    * @$$Eval (str) => str.replace(/: Promise</g, ": Navybird<")
    */
-  static all: { <TAll>(values: Iterable<TAll | PromiseLike<TAll>>): Navybird<TAll[]>; <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>, T10 | PromiseLike<T10>]): Navybird<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>; <T1, T2, T3, T4, T5, T6, T7, T8, T9>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>]): Navybird<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>; <T1, T2, T3, T4, T5, T6, T7, T8>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>]): Navybird<[T1, T2, T3, T4, T5, T6, T7, T8]>; <T1, T2, T3, T4, T5, T6, T7>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>]): Navybird<[T1, T2, T3, T4, T5, T6, T7]>; <T1, T2, T3, T4, T5, T6>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>]): Navybird<[T1, T2, T3, T4, T5, T6]>; <T1, T2, T3, T4, T5>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>]): Navybird<[T1, T2, T3, T4, T5]>; <T1, T2, T3, T4>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>]): Navybird<[T1, T2, T3, T4]>; <T1, T2, T3>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>]): Navybird<[T1, T2, T3]>; <T1, T2>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>]): Navybird<[T1, T2]>; <T>(values: (T | PromiseLike<T>)[]): Navybird<T[]>; };
+  static all: { <TAll>(values: Iterable<TAll | PromiseLike<TAll>>): Navybird<TAll[]>; <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>, T10 | PromiseLike<T10>]): Navybird<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>; <T1, T2, T3, T4, T5, T6, T7, T8, T9>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>]): Navybird<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>; <T1, T2, T3, T4, T5, T6, T7, T8>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>]): Navybird<[T1, T2, T3, T4, T5, T6, T7, T8]>; <T1, T2, T3, T4, T5, T6, T7>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>]): Navybird<[T1, T2, T3, T4, T5, T6, T7]>; <T1, T2, T3, T4, T5, T6>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>]): Navybird<[T1, T2, T3, T4, T5, T6]>; <T1, T2, T3, T4, T5>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>]): Navybird<[T1, T2, T3, T4, T5]>; <T1, T2, T3, T4>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>]): Navybird<[T1, T2, T3, T4]>; <T1, T2, T3>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>]): Navybird<[T1, T2, T3]>; <T1, T2>(values: readonly [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>]): Navybird<[T1, T2]>; <T>(values: readonly (T | PromiseLike<T>)[]): Navybird<T[]>; };
 
   /**
    * Creates a Promise that is resolved or rejected when any of the provided Promises are resolved
@@ -490,7 +492,7 @@ export class Navybird<T> extends Promise<T> {
    * @$TypeExpand PromiseConstructor['race']
    * @$$Eval (str) => str.replace(/: Promise</g, ": Navybird<")
    */
-  static race: { <T>(values: Iterable<T | PromiseLike<T>>): Navybird<T>; <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>, T10 | PromiseLike<T10>]): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10>; <T1, T2, T3, T4, T5, T6, T7, T8, T9>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>]): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>; <T1, T2, T3, T4, T5, T6, T7, T8>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>]): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8>; <T1, T2, T3, T4, T5, T6, T7>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>]): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7>; <T1, T2, T3, T4, T5, T6>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>]): Navybird<T1 | T2 | T3 | T4 | T5 | T6>; <T1, T2, T3, T4, T5>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>]): Navybird<T1 | T2 | T3 | T4 | T5>; <T1, T2, T3, T4>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>]): Navybird<T1 | T2 | T3 | T4>; <T1, T2, T3>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>]): Navybird<T1 | T2 | T3>; <T1, T2>(values: [T1 | PromiseLike<T1>, T2 | PromiseLike<T2>]): Navybird<T1 | T2>; <T>(values: (T | PromiseLike<T>)[]): Navybird<T>; }
+  static race: { <T>(values: Iterable<T | PromiseLike<T>>): Navybird<T>; <T>(values: readonly T[]): Navybird<T extends PromiseLike<infer U> ? U : T>; <T>(values: Iterable<T>): Navybird<T extends PromiseLike<infer U> ? U : T>; }
 
   /**
    * Creates a new rejected promise for the provided reason.
@@ -563,7 +565,8 @@ export class Navybird<T> extends Promise<T> {
 }
 
 rebindClass(Navybird);
-Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, string>) {
+(Object.keys(Navybird) as Array<keyof typeof Navybird>).forEach((key) => {
+  if (typeof key !== 'string') return;
   notEnumerableProp(Navybird, key, Navybird[key]);
 });
 
@@ -626,8 +629,8 @@ function rebindPrototypeMethods(Newbird: typeof Navybird) {
     ["reflect", reflect],
     ["inspectable", inspectable],
   ] as const) {
-    Newbird.prototype[name] = function () {
-      return func.call(this.constructor, this, ...arguments);
+    Newbird.prototype[name] = function (this: any) {
+      return (func as Function).call(this.constructor, this, ...arguments);
     } as any
   }
 
@@ -662,7 +665,7 @@ function rebindClassMethods(Newbird: typeof Navybird) {
       if (this && typeof this === 'function' && this.resolve && this.prototype && this.prototype.then) {
         promiseConstructor = this;
       }
-      return func.apply(promiseConstructor, arguments);
+      return (func as Function).apply(promiseConstructor, arguments);
     } as any
   }
 

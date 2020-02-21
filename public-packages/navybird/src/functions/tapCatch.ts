@@ -48,6 +48,7 @@ export function tapCatch<P extends PromiseLike<any>, U, E1>(
 ): GenericPromise<PromiseLikeValueType<P>>;
 
 export function tapCatch(
+  this: any,
   promise: Promise<any>,
   ...args: any[]
 ): Promise<any> {

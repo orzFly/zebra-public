@@ -17,6 +17,7 @@ export interface ConcurrencyOption {
  * *The original array is not modified.*
  */
 export function map<R, U>(
+  this: any,
   iterable: Resolvable<Iterable<Resolvable<R>>>,
   mapper: (item: R, index: number, arrayLength: number) => Resolvable<U>,
   opts?: ConcurrencyOption

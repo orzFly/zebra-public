@@ -1,5 +1,5 @@
-import * as ts from 'typescript';
-import * as fs from 'fs';
+import fs from 'fs';
+import ts from 'typescript';
 
 interface IReplacement {
   start: number,
@@ -23,29 +23,33 @@ function process(inputFile: string) {
     return sourceText;
   }
 
-  let replacements: IReplacement[] = [];
+  const replacements: IReplacement[] = [];
   const visitor: ts.Visitor = (node) => {
     const docs = ts.getJSDocTags(node);
     for (const doc of docs) {
       if (doc.tagName.text !== '$TypeExpand') continue;
 
       if (ts.isTypeAliasDeclaration(node) || ts.isPropertyDeclaration(node)) {
+        if (!node.type) throw new Error('Invalid node.type')
+        if (!doc.comment) throw new Error('Invalid doc.comment')
         const text = applyReplacements(node.getSourceFile().getText(), [{
           start: node.type.getStart(),
           end: node.type.getEnd(),
           text: doc.comment
         }])
-        const tmpFile = inputFile + ".tmp.ts";
+        const tmpFile = `${inputFile}.tmp.ts`;
         fs.writeFileSync(tmpFile, text);
         const tmpProg = ts.createProgram({
           rootNames: [tmpFile],
           options: {},
         })
         const tmpSrc = tmpProg.getSourceFile(tmpFile)
+        if (!tmpSrc) throw new Error('Invalid tmpSrc');
+
         const tmpChecker = tmpProg.getTypeChecker();
         fs.unlinkSync(tmpFile);
-      
-        let foundNode: ts.TypeAliasDeclaration
+
+        let foundNode: ts.TypeAliasDeclaration | undefined
         const nodeFinder: ts.Visitor = (tmpNode) => {
           if (foundNode) return undefined;
           if (tmpNode.pos === node.pos && tmpNode.kind === node.kind) {
@@ -57,6 +61,7 @@ function process(inputFile: string) {
         }
         ts.forEachChild(tmpSrc, nodeFinder);
 
+        if (!foundNode) throw new Error('Invalid foundNode');
         const tmpType = tmpChecker.getTypeAtLocation(foundNode.name);
         let replace = tmpChecker.typeToString(
           tmpType,
@@ -66,7 +71,8 @@ function process(inputFile: string) {
 
         const evalDoc = docs.find((i) => i.tagName.text === '$$Eval')
         if (evalDoc) {
-          replace = eval(evalDoc.comment)(replace)
+          if (!evalDoc.comment) throw new Error('Invalid evalDoc.comment');
+          replace = (0, eval)(evalDoc.comment)(replace)
         }
 
         replacements.push({
@@ -81,6 +87,7 @@ function process(inputFile: string) {
     return undefined;
   }
 
+  if (!src) throw new Error('Invalid src');
   ts.forEachChild(src, visitor);
 
   const text = applyReplacements(src.getSourceFile().getText(), replacements);

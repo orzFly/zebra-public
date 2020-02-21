@@ -13,6 +13,7 @@ import { tapSchedule } from './schedule';
  * If any promise in the input array is rejected or any promise returned by the iterator function is rejected, the result will be rejected as well.
  */
 export function mapSeries<R, U>(
+  this: any,
   iterable: Resolvable<Iterable<Resolvable<R>>>,
   iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>
 ): GenericPromise<U[]> {

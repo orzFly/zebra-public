@@ -187,7 +187,7 @@ export function promisify(
   try {
     if (func.name) {
       Object.defineProperty(result, 'name', {
-        value: func.name + 'Async',
+        value: `${func.name}Async`,
         writable: false,
         enumerable: false,
         configurable: true

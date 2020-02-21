@@ -16,6 +16,7 @@ export function fromCallback<T>(
 ): GenericPromise<T>;
 
 export function fromCallback(
+  this: any,
   fn: (callback: (err: any, result?: any) => void) => void,
   options?: FromCallbackOptions
 ) {

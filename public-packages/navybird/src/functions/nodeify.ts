@@ -26,28 +26,29 @@ export function nodeify<P extends PromiseLike<any>>(
 
   const spread = options !== undefined && Object(options).spread;
   const successAdapter = spread
-    ? function nodeifySpreadAdapter(res: PromiseLikeValueType<P>) {
+    ? function nodeifySpreadAdapter(this: any, res: PromiseLikeValueType<P>) {
       const THIS = this;
       nextTick(function nodeifySpreadAdapterNextTick() {
         if (Array.isArray(res)) {
-          callback.apply(THIS, [null].concat(res));
+          (callback as Function).apply(THIS, [null].concat(res));
         }
         return callback.call(THIS, null, res);
       });
     }
-    : function nodeifyNormalAdapter(res: PromiseLikeValueType<P>) {
+    : function nodeifyNormalAdapter(this: any, res: PromiseLikeValueType<P>) {
       const THIS = this;
       nextTick(function nodeifyNormalAdapterNextTick() {
-        if (res === undefined)
+        if (res === undefined) {
           return callback.call(THIS, null);
+        }
         return callback.call(THIS, null, res);
       });
     };
 
-  const errorAdapter = function nodeifyErrorAdapter(err: any) {
+  const errorAdapter = function nodeifyErrorAdapter(this: any, err: any) {
     const THIS = this;
     if (!err) {
-      var newReason = new Error(err + "");
+      const newReason = new Error(`${err}`);
       (newReason as any).cause = err;
       err = newReason;
     }

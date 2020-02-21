@@ -2,7 +2,7 @@ declare var window: any;
 declare var globalThis: any;
 declare var global: any;
 
-export const TypeError: TypeErrorConstructor = (function () {
+export const TypeError: TypeErrorConstructor = (function (this: any) {
   try { const x = this.TypeError; if (x) return x; } catch (e) { };
   try { const x = globalThis.TypeError; if (x) return x; } catch (e) { };
   try { const x = global.TypeError; if (x) return x; } catch (e) { };

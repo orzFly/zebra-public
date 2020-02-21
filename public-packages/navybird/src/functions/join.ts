@@ -1,5 +1,5 @@
-import { Resolvable } from '../helpers/types';
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { Resolvable } from '../helpers/types';
 
 /**
  * Promise.join(
@@ -45,7 +45,7 @@ export function join<R, A1, A2, A3, A4, A5>(
 /** @deprecated use .all instead */
 export function join<R>(...values: Array<Resolvable<R>>): GenericPromise<R[]>;
 
-export function join<R>(...args: Array<Resolvable<R>>): GenericPromise<R[]> {
+export function join<R>(this: any, ...args: Array<Resolvable<R>>): GenericPromise<R[]> {
   const Promise = getPromiseConstructor(this);
 
   const last = args.length - 1;

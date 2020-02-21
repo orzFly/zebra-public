@@ -17,7 +17,8 @@
     "strictNullChecks": true,
     "lib": [
       "es5",
-      "es6"
+      "es6",
+      "dom"
     ],
     "jsx": "react",
     "importHelpers": false,
