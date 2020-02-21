@@ -1,0 +1,33 @@
+{
+  "name": "@navybird/codegen",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "author": "Yeechan Lu",
+  "main": "index.js",
+  "scripts": {
+    "build": "invoke pipeline build",
+    "clean": "invoke pipeline clean",
+    "cleanbuild": "invoke pipeline cleanbuild",
+    "cleanwatch": "invoke pipeline cleanwatch",
+    "dev": "invoke pipeline dev",
+    "dist": "invoke pipeline dist",
+    "fix": "invoke pipeline fix",
+    "lint": "invoke pipeline lint",
+    "watch": "invoke pipeline watch"
+  },
+  "dependencies": {
+    "typescript": "3.7.x"
+  },
+  "devDependencies": {
+    "@types/node": "^11.13.2"
+  },
+  "invoke/pipeline": {
+    "typescript": {
+      "build": "tsc",
+      "clean": "rimraf lib",
+      "lint": "tslint --project tsconfig.json --config tslint.json",
+      "watch": "tsc --watch --preserveWatchOutput"
+    }
+  }
+}

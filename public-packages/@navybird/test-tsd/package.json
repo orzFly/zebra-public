@@ -1,0 +1,30 @@
+{
+  "name": "@navybird/test-tsd",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "author": "Yeechan Lu",
+  "scripts": {
+    "build": "invoke pipeline build",
+    "clean": "invoke pipeline clean",
+    "cleanbuild": "invoke pipeline cleanbuild",
+    "cleanwatch": "invoke pipeline cleanwatch",
+    "dev": "invoke pipeline dev",
+    "dist": "invoke pipeline dist",
+    "fix": "invoke pipeline fix",
+    "lint": "invoke pipeline lint",
+    "watch": "invoke pipeline watch"
+  },
+  "dependencies": {
+    "navybird": "*"
+  },
+  "devDependencies": {
+    "tsd": "^0.11.0"
+  },
+  "invoke/pipeline": {
+    "$auto": false,
+    "tsd": {
+      "test": "tsd"
+    }
+  }
+}

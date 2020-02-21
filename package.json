@@ -39,8 +39,8 @@
       "$requires": [
         "constraints"
       ],
-      "lint": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json .local/*/package.json --check",
-      "fix": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json .local/*/package.json"
+      "lint": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json public-packages/*/package.json public-packages/@*/*/package.json .local/*/package.json --check",
+      "fix": "sort-package-json package.json packages/*/package.json packages/@*/*/package.json public-packages/*/package.json public-packages/@*/*/package.json .local/*/package.json"
     },
     "yarn.lock": {
       "$requires": [

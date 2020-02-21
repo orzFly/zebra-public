@@ -1,0 +1,38 @@
+{
+  "name": "navybird",
+  "version": "0.2.0",
+  "description": "A polyfill of (mostly) Bluebird utilties for native Promise",
+  "license": "MIT",
+  "author": "Yeechan Lu",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "invoke pipeline build",
+    "clean": "invoke pipeline clean",
+    "cleanbuild": "invoke pipeline cleanbuild",
+    "cleanwatch": "invoke pipeline cleanwatch",
+    "dev": "invoke pipeline dev",
+    "dist": "invoke pipeline dist",
+    "fix": "invoke pipeline fix",
+    "lint": "invoke pipeline lint",
+    "watch": "invoke pipeline watch"
+  },
+  "devDependencies": {
+    "@navybird/codegen": "*"
+  },
+  "invoke/pipeline": {
+    "codegen": {
+      "build": "node ../@navybird/codegen/lib"
+    },
+    "typescript": {
+      "$requires": "codegen",
+      "build": "tsc",
+      "clean": "rimraf lib",
+      "lint": "tslint --project tsconfig.json --config tslint.json",
+      "watch": "tsc --watch --preserveWatchOutput"
+    }
+  }
+}
