@@ -27,18 +27,14 @@ jobs:
       env:
         CI: true
 
-    - name: yarn build
-      run: yarn build
-      env:
-        CI: true
-
     - name: yarn dist
       run: yarn dist
       env:
         CI: true
 
     - name: Collect dist
-      run: yarn invoke @collectDist
+      run: |
+        yarn invoke @collectDist --affix "g$(git rev-parse --short=7 HEAD)-$(date -u +%Y%m%d%H%M%S)"
       env:
         CI: true
 
@@ -49,5 +45,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: dist
+        name: dist-node${{ matrix.node-version }}
         path: dist
