@@ -23,9 +23,9 @@
     "watch": "invoke pipeline watch"
   },
   "devDependencies": {
+    "@orz/invoke": "^1.0.0",
     "@orz/typescript": "^1.0.0",
     "@types/emscripten": "^1.39.0",
-    "lerna": "^3.5.0",
     "rimraf": "^3.0.0",
     "sort-package-json": "^1.31.0",
     "yarn-deduplicate": "^1.1.1"
