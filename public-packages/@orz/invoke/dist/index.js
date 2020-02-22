@@ -29169,7 +29169,6 @@ const rimraf_1 = __importDefault(__webpack_require__(791));
 const copyPromise_1 = __webpack_require__(86);
 const Solution_1 = __webpack_require__(67);
 const Assert_1 = __webpack_require__(990);
-const DependencyGraph_1 = __webpack_require__(677);
 const FilesystemUtils_1 = __webpack_require__(672);
 const TaskContext_1 = __webpack_require__(919);
 class ExtractLockFileCommand extends TaskContext_1.Command {
@@ -29194,9 +29193,7 @@ class ExtractLockFileCommand extends TaskContext_1.Command {
         ]) {
             await this.syncRootPath(path);
         }
-        const resolvedDependencyMap = DependencyGraph_1.map(DependencyGraph_1.resolve(this.solution.projectDependencyMap));
-        const dependencies = resolvedDependencyMap.get(this.solution.activeProject.dependencyTag).filter((i) => i.type === 'project').map((i) => (i.type === 'project' ? i.project : null));
-        for (const project of dependencies) {
+        for (const project of this.solution.allProjects()) {
             const relativePath = this.getPathRelatedToRoot(project.projectRoot);
             await this.copyPackage([relativePath], project);
         }
@@ -29206,16 +29203,18 @@ class ExtractLockFileCommand extends TaskContext_1.Command {
                 ...targetManifest.workspaces || [],
                 ...this.solution.rootProject.manifest.workspaces || [],
             ])];
-        targetManifest.workspaces = targetManifest.workspaces.filter((i) => i.startsWith('packages/'));
+        targetManifest.workspaces = targetManifest.workspaces.filter((i) => !i.startsWith('packages/'));
         targetManifest.private = true;
         this.rewritePackageJson(targetManifest);
         await fslib_1.xfs.writeFilePromise(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename("package.json")), `${JSON.stringify(targetManifest, null, 2)}\n`);
-        await this.taskContext.execute("yarn install --forzen-lockfile", [], {
+        const rc = await this.taskContext.execute("yarn install --forzen-lockfile", [], {
             cwd: this.workingDir, env: {
                 ...this.env,
                 "YARN_ORZ_NO_INSTALL": "1"
             }
         });
+        if (rc)
+            throw new Error(`Invalid yarn return value: ${rc}`);
         await fslib_1.xfs.copyFilePromise(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename("yarn.lock")), fslib_1.ppath.resolve(this.solution.solutionRoot, fslib_1.toFilename("yarn-public.lock")));
         await this.safeRimraf(fslib_1.npath.fromPortablePath(this.workingDir));
     }
@@ -36833,7 +36832,7 @@ class ArchiveCommand extends TaskContext_1.Command {
         ]) {
             await this.syncRootPath(path);
         }
-        const resolvedDependencyMap = DependencyGraph_1.map(DependencyGraph_1.resolve(this.solution.projectDependencyMap));
+        const resolvedDependencyMap = DependencyGraph_1.map(DependencyGraph_1.resolve(this.solution.projectProductionDependencyMap));
         const dependencies = resolvedDependencyMap.get(this.solution.activeProject.dependencyTag).filter((i) => i.type === 'project').map((i) => (i.type === 'project' ? i.project : null));
         for (const project of dependencies) {
             const relativePath = this.getPathRelatedToRoot(project.projectRoot);
@@ -36849,6 +36848,11 @@ class ArchiveCommand extends TaskContext_1.Command {
         this.rewritePackageJson(targetManifest);
         await fslib_1.xfs.writeFilePromise(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename("package.json")), `${JSON.stringify(targetManifest, null, 2)}\n`);
         await this.taskContext.execute("yarn --forzen-lockfile --production", [], { cwd: this.workingDir });
+        await this.safeRimraf(fslib_1.npath.fromPortablePath(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename(".yarn"), fslib_1.toFilename("releases"))));
+        await this.safeRimraf(fslib_1.npath.fromPortablePath(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename(".npmrc"))));
+        await this.safeRimraf(fslib_1.npath.fromPortablePath(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename(".yarnrc"))));
+        await this.safeRimraf(fslib_1.npath.fromPortablePath(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename(".yarnrc.yml"))));
+        await this.safeRimraf(fslib_1.npath.fromPortablePath(fslib_1.ppath.resolve(this.workingDir, fslib_1.toFilename("node_modules"), fslib_1.toFilename("@types"))));
         const result = fslib_1.ppath.resolve(this.cwd, fslib_1.toFilename("dist"), fslib_1.toFilename("archive.zip"));
         await fslib_1.xfs.mkdirpPromise(fslib_1.ppath.dirname(result));
         if (await fslib_1.xfs.existsPromise(result))

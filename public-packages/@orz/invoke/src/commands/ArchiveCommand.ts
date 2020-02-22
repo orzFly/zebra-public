@@ -36,7 +36,7 @@ export class ArchiveCommand extends Command {
       await this.syncRootPath(path);
     }
 
-    const resolvedDependencyMap = map(resolve(this.solution.projectDependencyMap))
+    const resolvedDependencyMap = map(resolve(this.solution.projectProductionDependencyMap))
     const dependencies = resolvedDependencyMap.get(this.solution.activeProject.dependencyTag)!.filter((i) => i.type === 'project').map((i) => (i.type === 'project' ? i.project : null)!);
 
     for (const project of dependencies) {
@@ -58,6 +58,11 @@ export class ArchiveCommand extends Command {
     );
 
     await this.taskContext.execute("yarn --forzen-lockfile --production", [], { cwd: this.workingDir });
+    await this.safeRimraf(npath.fromPortablePath(ppath.resolve(this.workingDir, toFilename(".yarn"), toFilename("releases"))))
+    await this.safeRimraf(npath.fromPortablePath(ppath.resolve(this.workingDir, toFilename(".npmrc"))))
+    await this.safeRimraf(npath.fromPortablePath(ppath.resolve(this.workingDir, toFilename(".yarnrc"))))
+    await this.safeRimraf(npath.fromPortablePath(ppath.resolve(this.workingDir, toFilename(".yarnrc.yml"))))
+    await this.safeRimraf(npath.fromPortablePath(ppath.resolve(this.workingDir, toFilename("node_modules"), toFilename("@types"))))
 
     const result = ppath.resolve(this.cwd, toFilename("dist"), toFilename("archive.zip"));
     await xfs.mkdirpPromise(ppath.dirname(result));
