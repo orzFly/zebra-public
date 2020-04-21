@@ -2,13 +2,13 @@
   "name": "@orz/invoke",
   "version": "1.0.0",
   "license": "UNLICENSED",
+  "main": "lib",
+  "types": "lib",
+  "bin": "bin/invoke.js",
   "files": [
     "lib",
     "bin"
   ],
-  "main": "lib",
-  "types": "lib",
-  "bin": "bin/invoke.js",
   "scripts": {
     "build": "invoke pipeline build",
     "clean": "invoke pipeline clean",
@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@types/globby": "^9.1.0",
-    "@types/node": "^13.7.1",
+    "@types/node": "^13.13.1",
     "@types/rimraf": "^2.0.3",
     "@zeit/ncc": "^0.21.0"
   },

@@ -2,11 +2,11 @@
   "name": "@orz/marline",
   "version": "1.0.0",
   "license": "UNLICENSED",
+  "main": "lib",
+  "types": "lib",
   "files": [
     "lib"
   ],
-  "main": "lib",
-  "types": "lib",
   "scripts": {
     "build": "invoke pipeline build",
     "clean": "invoke pipeline clean",

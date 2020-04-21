@@ -2,10 +2,10 @@
   "name": "@orz/tslint-rules",
   "version": "1.0.0",
   "license": "UNLICENSED",
+  "main": "tslint.json",
   "files": [
     "tslint.json"
   ],
-  "main": "tslint.json",
   "dependencies": {
     "tslint-no-unused-expression-chai": "^0.1.4"
   },
