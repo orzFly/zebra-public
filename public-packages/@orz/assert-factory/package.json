@@ -23,9 +23,9 @@
   },
   "invoke/pipeline": {
     "typescript": {
-      "build": "tsc",
-      "watch": "tsc --watch --preserveWatchOutput",
-      "clean": "rimraf lib",
+      "build": "tsc --build --incremental tsconfig.json",
+      "watch": "tsc --build --incremental --watch --preserveWatchOutput tsconfig.json",
+      "clean": "tsc --build --incremental --clean tsconfig.json",
       "lint": "tslint --project tsconfig.json --config tslint.json"
     }
   }

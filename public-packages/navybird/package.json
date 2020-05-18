@@ -29,10 +29,10 @@
     },
     "typescript": {
       "$requires": "codegen",
-      "build": "tsc",
-      "clean": "rimraf lib",
+      "build": "tsc --build --incremental tsconfig.json",
+      "clean": "tsc --build --incremental --clean tsconfig.json",
       "lint": "tslint --project tsconfig.json --config tslint.json",
-      "watch": "tsc --watch --preserveWatchOutput"
+      "watch": "tsc --build --incremental --watch --preserveWatchOutput tsconfig.json"
     }
   }
 }

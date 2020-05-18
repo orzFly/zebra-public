@@ -46,19 +46,19 @@ gen_enforced_field(WorkspaceCwd, 'scripts.dist', 'invoke pipeline dist') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false).
 
-gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.build', 'tsc') :-
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.build', 'tsc --build --incremental tsconfig.json') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline.typescript', false),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline.$auto', false).
 
-gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.watch', 'tsc --watch --preserveWatchOutput') :-
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.watch', 'tsc --build --incremental --watch --preserveWatchOutput tsconfig.json') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline.typescript', false),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline.$auto', false).
 
-gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.clean', 'rimraf lib') :-
+gen_enforced_field(WorkspaceCwd, 'invoke/pipeline.typescript.clean', 'tsc --build --incremental --clean tsconfig.json') :-
     workspace(WorkspaceCwd),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline', false),
     \+ workspace_field(WorkspaceCwd, 'invoke/pipeline.typescript', false),

@@ -4,6 +4,9 @@
 /.yarn/unplugged/*
 /.yarn/build-state.yml
 
+# TypeScript incremental build info
+*.tsbuildinfo
+
 # dist
 dist/
 dist-dev/
