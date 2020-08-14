@@ -137,9 +137,13 @@ export class ArchiveCommand extends Command {
         try {
           const map = await xfs.readJsonPromise(file);
           Assert(!map.sourceRoot, "Cannot parse sourceMap with sourceRoot");
-          (map.sources || []).forEach((i: string) => {
-            files.add(npath.toPortablePath(npath.resolve(npath.fromPortablePath(ppath.dirname(file)), i)))
-          })
+          Assert((map.sourcesContent || []).length == 0, "Cannot parse sourceMap with sourcesContent");
+          for (const i of (map.sources || [])) {
+            const path = npath.toPortablePath(npath.resolve(npath.fromPortablePath(ppath.dirname(file)), i))
+            if (await xfs.existsPromise(path)) {
+              files.add(path)
+            }
+          }
         } catch { }
       }
     }
