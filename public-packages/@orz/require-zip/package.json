@@ -20,8 +20,7 @@
   },
   "dependencies": {
     "@yarnpkg/fslib": "^2.1.0",
-    "@yarnpkg/libzip": "^2.1.0",
-    "fs-monkey": "^0.3.3"
+    "@yarnpkg/libzip": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^13.13.1",
@@ -36,7 +35,7 @@
     },
     "bundle": {
       "$requires": "typescript",
-      "clean": "rimraf dist-dev",
+      "clean": "rimraf dist dist-dev",
       "dev": "ncc build lib -o dist-dev -w",
       "dist": "ncc build lib -o dist -m"
     }

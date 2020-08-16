@@ -1,9 +1,9 @@
 import { NodeFS, patchFs as fslibPatchFs, PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
 import { getLibzipSync } from '@yarnpkg/libzip';
 import fs from 'fs';
+import { patchRequireWithFs } from './patchRequireWithFs';
 import { ZipDirFS } from './ZipDirFS';
 
-const { patchRequire: fsMonkeyPatchRequire } = require('fs-monkey');
 const libzip = getLibzipSync();
 
 const original = libzip.name.locate;
@@ -47,7 +47,7 @@ let requirePatched = false;
 export function patchRequire() {
   if (requirePatched) return;
 
-  fsMonkeyPatchRequire(patchedFs);
+  patchRequireWithFs(patchedFs);
   requirePatched = true;
 }
 
