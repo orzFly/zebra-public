@@ -19,8 +19,8 @@
     "watch": "invoke pipeline watch"
   },
   "dependencies": {
-    "@yarnpkg/fslib": "^2.0.0-rc.14",
-    "@yarnpkg/libzip": "^2.0.0-rc.9",
+    "@yarnpkg/fslib": "^2.1.0",
+    "@yarnpkg/libzip": "^2.1.0",
     "fs-monkey": "^0.3.3"
   },
   "devDependencies": {
