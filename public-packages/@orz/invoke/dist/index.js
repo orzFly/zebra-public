@@ -1384,43 +1384,66 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __webpack_require__(565);
 const fs_1 = __importDefault(__webpack_require__(747));
+// 1980-01-01, like Fedora
+const defaultTime = 315532800;
 async function copyPromise(destinationFs, destination, sourceFs, source, opts) {
+    opts = { ...opts };
+    if (opts.stableSort === undefined) {
+        opts.stableSort = true;
+    }
     const normalizedDestination = destinationFs.pathUtils.normalize(destination);
     const normalizedSource = sourceFs.pathUtils.normalize(source);
-    const operations = [];
-    const utimes = [];
-    await destinationFs.mkdirpPromise(destination);
-    await copyImpl(operations, utimes, destinationFs, normalizedDestination, sourceFs, normalizedSource, opts);
-    for (const operation of operations) {
+    const prelayout = [];
+    const postlayout = [];
+    await destinationFs.mkdirPromise(destinationFs.pathUtils.dirname(destination), { recursive: true });
+    const updateTime = typeof destinationFs.lutimesPromise === `function`
+        ? destinationFs.lutimesPromise.bind(destinationFs)
+        : destinationFs.utimesPromise.bind(destinationFs);
+    await copyImpl(prelayout, postlayout, updateTime, destinationFs, normalizedDestination, sourceFs, normalizedSource, opts);
+    for (const operation of prelayout) {
         await operation();
     }
-    for (const [p, atime, mtime] of utimes) {
-        await destinationFs.utimesPromise(p, atime, mtime);
+    for (const operation of postlayout) {
+        await operation();
     }
 }
 exports.copyPromise = copyPromise;
-async function copyImpl(operations, utimes, destinationFs, destination, sourceFs, source, opts) {
+async function copyImpl(prelayout, postlayout, updateTime, destinationFs, destination, sourceFs, source, opts) {
     if (opts.whitelist && !opts.whitelist.includes(source))
         return;
     const destinationStat = await maybeLStat(destinationFs, destination);
     const sourceStat = await sourceFs.lstatPromise(source);
-    utimes.push([destination, sourceStat.atime, sourceStat.mtime]);
+    if (opts.stableTime) {
+        postlayout.push(() => updateTime(destination, defaultTime, defaultTime));
+    }
+    else {
+        postlayout.push(() => updateTime(destination, sourceStat.atime, sourceStat.mtime));
+    }
     switch (true) {
         case sourceStat.isDirectory():
-            await copyFolder(operations, utimes, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
+            {
+                await copyFolder(prelayout, postlayout, updateTime, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
+            }
             break;
         case sourceStat.isFile():
-            await copyFile(operations, utimes, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
+            {
+                await copyFile(prelayout, postlayout, updateTime, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
+            }
             break;
         case sourceStat.isSymbolicLink():
-            await copySymlink(operations, utimes, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
+            {
+                await copySymlink(prelayout, postlayout, updateTime, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
+            }
             break;
         default:
-            throw new Error(`Unsupported file type (${sourceStat.mode})`);
+            {
+                throw new Error(`Unsupported file type (${sourceStat.mode})`);
+            }
+            break;
     }
-    if (!sourceStat.isSymbolicLink()) {
-        operations.push(async () => destinationFs.chmodPromise(destination, sourceStat.mode & 0o777));
-    }
+    postlayout.push(() => {
+        return destinationFs.chmodPromise(destination, sourceStat.mode & 0o777);
+    });
 }
 async function maybeLStat(baseFs, p) {
     try {
@@ -1430,10 +1453,10 @@ async function maybeLStat(baseFs, p) {
         return null;
     }
 }
-async function copyFolder(operations, utimes, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts) {
+async function copyFolder(prelayout, postlayout, updateTime, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts) {
     if (destinationStat !== null && !destinationStat.isDirectory()) {
         if (opts.overwrite) {
-            operations.push(async () => destinationFs.removePromise(destination));
+            prelayout.push(async () => destinationFs.removePromise(destination));
             destinationStat = null;
         }
         else {
@@ -1441,17 +1464,24 @@ async function copyFolder(operations, utimes, destinationFs, destination, destin
         }
     }
     if (destinationStat === null) {
-        operations.push(async () => destinationFs.mkdirPromise(destination, { mode: sourceStat.mode }));
+        prelayout.push(async () => destinationFs.mkdirPromise(destination, { mode: sourceStat.mode }));
     }
     const entries = await sourceFs.readdirPromise(source);
-    await Promise.all(entries.map(async (entry) => {
-        await copyImpl(operations, utimes, destinationFs, destinationFs.pathUtils.join(destination, entry), sourceFs, sourceFs.pathUtils.join(source, entry), opts);
-    }));
+    if (opts.stableSort) {
+        for (const entry of entries.sort()) {
+            await copyImpl(prelayout, postlayout, updateTime, destinationFs, destinationFs.pathUtils.join(destination, entry), sourceFs, sourceFs.pathUtils.join(source, entry), opts);
+        }
+    }
+    else {
+        await Promise.all(entries.map(async (entry) => {
+            await copyImpl(prelayout, postlayout, updateTime, destinationFs, destinationFs.pathUtils.join(destination, entry), sourceFs, sourceFs.pathUtils.join(source, entry), opts);
+        }));
+    }
 }
-async function copyFile(operations, _utimes, destinationFs, destination, destinationStat, sourceFs, source, _sourceStat, opts) {
+async function copyFile(prelayout, _postlayout, _updateTime, destinationFs, destination, destinationStat, sourceFs, source, _sourceStat, opts) {
     if (destinationStat !== null) {
         if (opts.overwrite) {
-            operations.push(async () => destinationFs.removePromise(destination));
+            prelayout.push(async () => destinationFs.removePromise(destination));
             destinationStat = null;
         }
         else {
@@ -1459,16 +1489,16 @@ async function copyFile(operations, _utimes, destinationFs, destination, destina
         }
     }
     if (destinationFs === sourceFs) {
-        operations.push(async () => destinationFs.copyFilePromise(source, destination, fs_1.default.constants.COPYFILE_FICLONE));
+        prelayout.push(async () => destinationFs.copyFilePromise(source, destination, fs_1.default.constants.COPYFILE_FICLONE));
     }
     else {
-        operations.push(async () => destinationFs.writeFilePromise(destination, await sourceFs.readFilePromise(source)));
+        prelayout.push(async () => destinationFs.writeFilePromise(destination, await sourceFs.readFilePromise(source)));
     }
 }
-async function copySymlink(operations, _utimes, destinationFs, destination, destinationStat, sourceFs, source, _sourceStat, opts) {
+async function copySymlink(prelayout, _postlayout, _updateTime, destinationFs, destination, destinationStat, sourceFs, source, _sourceStat, opts) {
     if (destinationStat !== null) {
         if (opts.overwrite) {
-            operations.push(async () => destinationFs.removePromise(destination));
+            prelayout.push(async () => destinationFs.removePromise(destination));
             destinationStat = null;
         }
         else {
@@ -1476,7 +1506,7 @@ async function copySymlink(operations, _utimes, destinationFs, destination, dest
         }
     }
     const target = await sourceFs.readlinkPromise(source);
-    operations.push(async () => destinationFs.symlinkPromise(path_1.convertPath(destinationFs.pathUtils, target), destination));
+    prelayout.push(async () => destinationFs.symlinkPromise(path_1.convertPath(destinationFs.pathUtils, target), destination));
 }
 //# sourceMappingURL=copyPromise.js.map
 
@@ -37151,8 +37181,8 @@ class ArchiveCommand extends TaskContext_1.Command {
         await fslib_1.xfs.mkdirpPromise(fslib_1.ppath.dirname(result));
         if (await fslib_1.xfs.existsPromise(result))
             await fslib_1.xfs.removePromise(result);
-        const zip = new fslib_1.ZipFS(result, { libzip: await libzip_1.getLibzipPromise(), create: true });
-        await zip.copyPromise(zip.pathUtils.resolve('/'), this.workingDir, { baseFs: fslib_1.xfs });
+        const zip = new fslib_1.ZipFS(result, { libzip: await libzip_1.getLibzipPromise(), create: true, level: 9 });
+        await copyPromise_1.copyPromise(zip, fslib_1.PortablePath.root, fslib_1.xfs, this.workingDir, { overwrite: true, stableSort: true, stableTime: false });
         zip.saveAndClose();
         await this.safeRimraf(fslib_1.npath.fromPortablePath(this.workingDir));
     }
@@ -37248,8 +37278,9 @@ class ArchiveCommand extends TaskContext_1.Command {
         await copyPromise_1.copyPromise(fslib_1.xfs, fslib_1.ppath.resolve(this.workingDir, ...filename), fslib_1.xfs, source, { overwrite: true });
     }
     async getTmpDir() {
-        Assert_1.Assert.isTruthy(os_1.tmpdir(), "Invalid tmpdir");
-        return fslib_1.npath.toPortablePath(os_1.tmpdir());
+        const dir = os_1.tmpdir();
+        Assert_1.Assert.isTruthy(dir, "Invalid tmpdir");
+        return fslib_1.npath.toPortablePath(dir);
     }
     async generateTmpFileName(dir) {
         let fullPath;

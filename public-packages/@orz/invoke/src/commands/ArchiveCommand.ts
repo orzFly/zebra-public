@@ -67,8 +67,8 @@ export class ArchiveCommand extends Command {
     const result = ppath.resolve(this.cwd, toFilename("dist"), toFilename("archive.zip"));
     await xfs.mkdirpPromise(ppath.dirname(result));
     if (await xfs.existsPromise(result)) await xfs.removePromise(result);
-    const zip = new ZipFS(result, { libzip: await getLibzipPromise(), create: true });
-    await zip.copyPromise(zip.pathUtils.resolve('/' as any), this.workingDir, { baseFs: xfs });
+    const zip = new ZipFS(result, { libzip: await getLibzipPromise(), create: true, level: 9 });
+    await copyPromise(zip, PortablePath.root, xfs, this.workingDir, { overwrite: true, stableSort: true, stableTime: false });
     zip.saveAndClose();
 
     await this.safeRimraf(npath.fromPortablePath(this.workingDir))
@@ -180,8 +180,9 @@ export class ArchiveCommand extends Command {
   }
 
   async getTmpDir() {
-    Assert.isTruthy(tmpdir(), "Invalid tmpdir");
-    return npath.toPortablePath(tmpdir())
+    const dir = tmpdir();
+    Assert.isTruthy(dir, "Invalid tmpdir");
+    return npath.toPortablePath(dir)
   }
 
   async generateTmpFileName(dir: PortablePath) {
