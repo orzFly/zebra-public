@@ -5,7 +5,7 @@
   "main": "lib",
   "types": "lib",
   "files": [
-    "lib"
+    "lib", "!lib/test*"
   ],
   "scripts": {
     "build": "invoke pipeline build",
