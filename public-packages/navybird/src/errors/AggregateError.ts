@@ -39,18 +39,20 @@ export namespace Capsule {
     length!: Array<T>['length']
 
     toString() {
-      var indent = Array(level * 4 + 1).join(" ");
-      var ret = "\n" + indent + "AggregateError of:" + "\n";
+      let indent = Array(level * 4 + 1).join(" ");
+      let ret = `\n${indent}AggregateError of:\n`;
       level++;
       indent = Array(level * 4 + 1).join(" ");
-      for (var i = 0; i < this.length; ++i) {
-        var str = (this[i] === this as any) ? "[Circular AggregateError]" : this[i] + "";
-        var lines = str.split("\n");
-        for (var j = 0; j < lines.length; ++j) {
+      // tslint:disable-next-line: prefer-for-of
+      for (let i = 0; i < this.length; ++i) {
+        // tslint:disable-next-line: prefer-template
+        let str = (this[i] === this as any) ? "[Circular AggregateError]" : this[i] + "";
+        const lines = str.split("\n");
+        for (let j = 0; j < lines.length; ++j) {
           lines[j] = indent + lines[j];
         }
         str = lines.join("\n");
-        ret += str + "\n";
+        ret += `${str}\n`;
       }
       level--;
       return ret;

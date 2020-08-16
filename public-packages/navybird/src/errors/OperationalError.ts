@@ -40,15 +40,14 @@ function isUntypedError(obj: unknown): obj is Error {
 };
 
 export function wrapAsOperationalError<T extends Error>(obj: T): OperationalError | T {
-  var ret;
+  let ret;
   if (isUntypedError(obj)) {
     ret = new OperationalError(obj);
     ret.name = obj.name;
     ret.message = obj.message;
     ret.stack = obj.stack;
-    var keys = Object.keys(obj);
-    for (var i = 0; i < keys.length; ++i) {
-      var key = keys[i];
+    const keys = Object.keys(obj);
+    for (const key of keys) {
       if (!regexErrorKey.test(key)) {
         (ret as any)[key] = (obj as any)[key];
       }
@@ -84,6 +83,7 @@ function isPrimitive(val: any) {
 
 function safeToString(obj: any) {
   try {
+    // tslint:disable-next-line: prefer-template
     return obj + "";
   } catch (e) {
     return "[no string representation]";
